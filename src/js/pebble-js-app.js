@@ -3,7 +3,7 @@ Pebble.addEventListener('ready', function() {
 });
 
 Pebble.addEventListener('showConfiguration', function() {
-  var url = 'https://17168558.ngrok.io';
+  var url = 'https://skwasha.github.io/Skwatch/';
 
   console.log('Showing configuration page: ' + url);
 
