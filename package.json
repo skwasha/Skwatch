@@ -13,7 +13,9 @@
         "enableMultiJS": true,
         "messageKeys": {
             "KEY_CONDITIONS": 1,
-            "KEY_TEMPERATURE": 0
+            "KEY_TEMPERATURE": 0,
+	    "KEY_TWENTY_FOUR_HOUR_FORMAT": 3,
+	    "KEY_BACKGROUND_COLOR": 2 
         },
         "projectType": "native",
         "resources": {

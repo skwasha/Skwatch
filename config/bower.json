@@ -1,0 +1,21 @@
+{
+  "name": "config",
+  "homepage": "https://github.com/skwasha/Skwatch",
+  "authors": [
+    "skwasha <sascha@umich.edu>"
+  ],
+  "description": "Configuration for the Skwatch Watchface",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "www/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "Slate": "pebble-slate#^0.0.3"
+  }
+}

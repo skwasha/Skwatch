@@ -2,6 +2,8 @@
 
 #define KEY_TEMPERATURE 0
 #define KEY_CONDITIONS 1
+#define KEY_BACKGROUND_COLOR 2
+#define KEY_TWENTY_FOUR_HOUR_FORMAT 3
 
 static Window *s_main_window;
 static TextLayer *s_time_layer, *s_date_layer;
@@ -16,6 +18,7 @@ static GFont s_weather_font;
 
 static char s_current_time_buffer[8], s_current_steps_buffer[16], s_emoji_buffer[5];
 static int s_step_count = 0, s_step_goal = 0, s_step_average = 0;
+static bool twenty_four_hour_format = false;
 
 // Is step data available?
 bool step_data_is_available() {
@@ -95,6 +98,30 @@ static void handle_battery(BatteryChargeState charge_state) {
   text_layer_set_text(s_battery_layer, battery_text);
 }
 
+static void update_time() {
+  // Get a tm structure
+  time_t temp = time(NULL); 
+  struct tm *tick_time = localtime(&temp);
+
+  // Write the current hours and minutes into a buffer
+  static char s_buffer[8];
+  static char s_date_buffer[16];
+  strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() == twenty_four_hour_format ?
+                                          "%H:%M" : "%I:%M", tick_time);
+
+  strftime(s_date_buffer, sizeof(s_date_buffer), "%a %m/%d", tick_time);
+  text_layer_set_text(s_date_layer, s_date_buffer);
+
+  // Display this time on the TextLayer
+  text_layer_set_text(s_time_layer, s_buffer);
+}
+
+static void set_background_and_text_color(int color) {
+  GColor background_color = GColorFromHEX(color);
+  window_set_background_color(s_main_window, background_color);
+  text_layer_set_text_color(s_time_layer, gcolor_legible_over(background_color));
+}
+
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   // Store incoming information
   static char temperature_buffer[8];
@@ -104,6 +131,8 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   // Read tuples for data
   Tuple *temp_tuple = dict_find(iterator, KEY_TEMPERATURE);
   Tuple *conditions_tuple = dict_find(iterator, KEY_CONDITIONS);
+  Tuple *background_color_t = dict_find(iterator, KEY_BACKGROUND_COLOR);
+  Tuple *twenty_four_hour_format_t = dict_find(iterator, KEY_TWENTY_FOUR_HOUR_FORMAT);
 
   // If all data is available, use it
   if(temp_tuple && conditions_tuple) {
@@ -113,6 +142,18 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     // Assemble full string and display
     snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s, %s", temperature_buffer, conditions_buffer);
     text_layer_set_text(s_weather_layer, weather_layer_buffer);
+  }
+
+  if (background_color_t) {
+    int background_color = background_color_t->value->int32;
+    persist_write_int(KEY_BACKGROUND_COLOR, background_color);
+    set_background_and_text_color(background_color);
+  }
+
+  if (twenty_four_hour_format_t) {
+    twenty_four_hour_format = twenty_four_hour_format_t->value->int8;
+    persist_write_int(KEY_TWENTY_FOUR_HOUR_FORMAT, twenty_four_hour_format);
+    update_time();
   }
 }
 
@@ -126,24 +167,6 @@ static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResul
 
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
-}
-
-static void update_time() {
-  // Get a tm structure
-  time_t temp = time(NULL); 
-  struct tm *tick_time = localtime(&temp);
-
-  // Write the current hours and minutes into a buffer
-  static char s_buffer[8];
-  static char s_date_buffer[16];
-  strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() ?
-                                          "%H:%M" : "%I:%M", tick_time);
-
-  strftime(s_date_buffer, sizeof(s_date_buffer), "%a %m/%d", tick_time);
-  text_layer_set_text(s_date_layer, s_date_buffer);
-
-  // Display this time on the TextLayer
-  text_layer_set_text(s_time_layer, s_buffer);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
@@ -167,6 +190,15 @@ static void main_window_load(Window *window) {
   // Get information about the Window
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
+
+  if (persist_read_int(KEY_BACKGROUND_COLOR)) {
+    int background_color = persist_read_int(KEY_BACKGROUND_COLOR);
+    set_background_and_text_color(background_color);
+  }
+
+  if (persist_read_bool(KEY_TWENTY_FOUR_HOUR_FORMAT)) {
+    twenty_four_hour_format = persist_read_bool(KEY_TWENTY_FOUR_HOUR_FORMAT);
+  }
 
   // Create date TextLayer
   s_date_layer = text_layer_create(
