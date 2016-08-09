@@ -12,14 +12,26 @@
         "displayName": "Skwatch",
         "enableMultiJS": true,
         "messageKeys": {
+            "KEY_BACKGROUND_COLOR": 2,
             "KEY_CONDITIONS": 1,
             "KEY_TEMPERATURE": 0,
-	    "KEY_TWENTY_FOUR_HOUR_FORMAT": 3,
-	    "KEY_BACKGROUND_COLOR": 2 
+            "KEY_TWENTY_FOUR_HOUR_FORMAT": 3
         },
         "projectType": "native",
         "resources": {
             "media": [
+                {
+                    "file": "fonts/Skwatch.ttf",
+                    "name": "SKWATCH_34",
+                    "targetPlatforms": null,
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/gvb_bus_pid_5x3.ttf",
+                    "name": "GVB_34",
+                    "targetPlatforms": null,
+                    "type": "font"
+                },
                 {
                     "file": "fonts/fast_money.ttf",
                     "name": "FAST_28",
@@ -29,12 +41,6 @@
                 {
                     "file": "fonts/belfast.ttf",
                     "name": "BELFAST_34",
-                    "targetPlatforms": null,
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/gvb_bus_pid_5x3.ttf",
-                    "name": "GVB_34",
                     "targetPlatforms": null,
                     "type": "font"
                 }

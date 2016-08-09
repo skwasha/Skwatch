@@ -65,13 +65,15 @@ static void display_step_count() {
 //     snprintf(s_emoji, sizeof(s_emoji), "\U0001F620");
   }
 
-  if(thousands > 0) {
-    snprintf(s_current_steps_buffer, sizeof(s_current_steps_buffer),
-      "%d,%03d ", thousands, hundreds);
-  } else {
-    snprintf(s_current_steps_buffer, sizeof(s_current_steps_buffer),
-      "%d ", hundreds);
-  }
+//   if(thousands > 0) {
+//     snprintf(s_current_steps_buffer, sizeof(s_current_steps_buffer),
+//       "%d,%03d ", thousands, hundreds);
+//   } else {
+//     snprintf(s_current_steps_buffer, sizeof(s_current_steps_buffer),
+//       "%d ", hundreds);
+//   }
+  snprintf(s_current_steps_buffer, sizeof(s_current_steps_buffer),
+      "%d ", s_step_count);
 //   snprintf(s_emoji_buffer, sizeof(s_emoji_buffer), "%s", s_emoji);
 //   text_layer_set_text(s_emoji_layer, s_emoji_buffer);
   text_layer_set_text(s_step_layer, s_current_steps_buffer);
@@ -109,7 +111,7 @@ static void update_time() {
   strftime(s_buffer, sizeof(s_buffer), clock_is_24h_style() == twenty_four_hour_format ?
                                           "%H:%M" : "%I:%M", tick_time);
 
-  strftime(s_date_buffer, sizeof(s_date_buffer), "%a %m/%d", tick_time);
+  strftime(s_date_buffer, sizeof(s_date_buffer), "%m/%d", tick_time);
   text_layer_set_text(s_date_layer, s_date_buffer);
 
   // Display this time on the TextLayer
@@ -136,11 +138,12 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 
   // If all data is available, use it
   if(temp_tuple && conditions_tuple) {
-    snprintf(temperature_buffer, sizeof(temperature_buffer), "%dF", (int)temp_tuple->value->int32);
+    snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°F", (int)temp_tuple->value->int32);
     snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", conditions_tuple->value->cstring);
 
     // Assemble full string and display
-    snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s, %s", temperature_buffer, conditions_buffer);
+//     snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s, %s", temperature_buffer, conditions_buffer);
+    snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s", temperature_buffer);
     text_layer_set_text(s_weather_layer, weather_layer_buffer);
   }
 
@@ -208,7 +211,7 @@ static void main_window_load(Window *window) {
   text_layer_set_text_alignment(s_date_layer, GTextAlignmentRight);
 
   // Create GFont
-  s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_BELFAST_34));
+  s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SKWATCH_34));
 
   // Apply to TextLayer
   text_layer_set_font(s_date_layer, s_date_font);
@@ -227,7 +230,7 @@ static void main_window_load(Window *window) {
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentRight);
 
   // Create GFont
-  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_BELFAST_34));
+  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SKWATCH_34));
 
   // Apply to TextLayer
   text_layer_set_font(s_time_layer, s_time_font);
@@ -246,7 +249,7 @@ static void main_window_load(Window *window) {
   text_layer_set_text(s_weather_layer, "Loading...");
 
   // Create second custom font, apply it and add to Window
-  s_weather_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_BELFAST_34));
+  s_weather_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SKWATCH_34));
   text_layer_set_font(s_weather_layer, s_weather_font);
   layer_add_child(window_layer, text_layer_get_layer(s_weather_layer));
 
@@ -254,7 +257,7 @@ static void main_window_load(Window *window) {
       GRect(0, 100, bounds.size.w, 34));
   text_layer_set_text_color(s_battery_layer, GColorLightGray);
   text_layer_set_background_color(s_battery_layer, GColorClear);
-  text_layer_set_font(s_battery_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_BELFAST_34)));
+  text_layer_set_font(s_battery_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SKWATCH_34)));
   text_layer_set_text_alignment(s_battery_layer, GTextAlignmentRight);
   text_layer_set_text(s_battery_layer, "100%");
 
@@ -274,7 +277,7 @@ static void main_window_load(Window *window) {
   text_layer_set_background_color(s_step_layer, GColorClear);
   text_layer_set_background_color(s_emoji_layer, GColorClear);
   text_layer_set_font(s_step_layer,
-                      fonts_load_custom_font(resource_get_handle(RESOURCE_ID_BELFAST_34)));
+                      fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SKWATCH_34)));
   text_layer_set_font(s_emoji_layer,
                       fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
   text_layer_set_text_alignment(s_step_layer, GTextAlignmentRight);
