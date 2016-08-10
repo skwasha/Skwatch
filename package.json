@@ -25,24 +25,6 @@
                     "name": "SKWATCH_35",
                     "targetPlatforms": null,
                     "type": "font"
-                },
-                {
-                    "file": "fonts/gvb_bus_pid_5x3.ttf",
-                    "name": "GVB_34",
-                    "targetPlatforms": null,
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/fast_money.ttf",
-                    "name": "FAST_28",
-                    "targetPlatforms": null,
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/belfast.ttf",
-                    "name": "BELFAST_34",
-                    "targetPlatforms": null,
-                    "type": "font"
                 }
             ]
         },
