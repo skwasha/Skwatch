@@ -10,13 +10,12 @@ static TextLayer *s_time_layer, *s_date_layer;
 static TextLayer *s_weather_layer;
 static TextLayer *s_battery_layer;
 static TextLayer *s_step_layer;
-static TextLayer *s_emoji_layer;
 
 static GFont s_time_font;
 static GFont s_date_font;
 static GFont s_weather_font;
 
-static char s_current_time_buffer[8], s_current_steps_buffer[16], s_emoji_buffer[5];
+static char s_current_steps_buffer[16];
 static int s_step_count = 0, s_step_goal = 0, s_step_average = 0;
 static bool twenty_four_hour_format = false;
 
@@ -31,8 +30,8 @@ bool step_data_is_available() {
 static void get_step_goal() {
   const time_t start = time_start_of_today();
   const time_t end = start + SECONDS_PER_DAY;
-  s_step_goal = (int)health_service_sum_averaged(HealthMetricStepCount,
-    start, end, HealthServiceTimeScopeDaily);
+  s_step_goal = (int)health_service_sum_averaged(HealthMetricStepCount, start, end, HealthServiceTimeScopeDaily);
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Step Goal: %d", s_step_goal);
 }
 
 // Todays current step count
@@ -44,38 +43,22 @@ static void get_step_count() {
 static void get_step_average() {
   const time_t start = time_start_of_today();
   const time_t end = time(NULL);
-  s_step_average = (int)health_service_sum_averaged(HealthMetricStepCount,
-    start, end, HealthServiceTimeScopeDaily);
+  s_step_average = (int)health_service_sum_averaged(HealthMetricStepCount, start, end, HealthServiceTimeScopeDaily);
 }
 
 static void display_step_count() {
-  int thousands = s_step_count / 1000;
-  int hundreds = s_step_count % 1000;
   static char s_emoji[5];
 
-  if(s_step_count >= s_step_average) {
+  if(s_step_count >= s_step_goal) {
     text_layer_set_text_color(s_step_layer, GColorJaegerGreen);
-//     text_layer_set_text_color(s_emoji_layer, GColorJaegerGreen);
-//     text_layer_set_text(s_emoji_layer, "\U0001F60C");
     snprintf(s_emoji, sizeof(s_emoji), "\U0001F60C");
   } else {
     text_layer_set_text_color(s_step_layer, GColorPictonBlue);
-//     text_layer_set_text_color(s_emoji_layer, GColorPictonBlue);
-//     text_layer_set_text(s_emoji_layer, "\U0001F4A9");
     snprintf(s_emoji, sizeof(s_emoji), "\U0001F620");
   }
 
-//   if(thousands > 0) {
-//     snprintf(s_current_steps_buffer, sizeof(s_current_steps_buffer),
-//       "%d,%03d ", thousands, hundreds);
-//   } else {
-//     snprintf(s_current_steps_buffer, sizeof(s_current_steps_buffer),
-//       "%d ", hundreds);
-//   }
   snprintf(s_current_steps_buffer, sizeof(s_current_steps_buffer),
       "%d%s", s_step_count, s_emoji);
-//   snprintf(s_emoji_buffer, sizeof(s_emoji_buffer), "%s", s_emoji);
-//   text_layer_set_text(s_emoji_layer, s_emoji_buffer);
   text_layer_set_text(s_step_layer, s_current_steps_buffer);
 }
 
@@ -164,7 +147,6 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     }
     // Assemble full string and display
     snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s%s", temperature_buffer, conditions_buffer);
-//     snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s", temperature_buffer);
     text_layer_set_text(s_weather_layer, weather_layer_buffer);
   }
 
@@ -227,21 +209,13 @@ static void main_window_load(Window *window) {
   // Create a layer to hold the current step count
   s_step_layer = text_layer_create(
       GRect(0, 133, bounds.size.w, 35));
-//   s_emoji_layer = text_layer_create(
-//       GRect(bounds.size.w - 20, 140, 20, 30));
   text_layer_set_text_color(s_step_layer, GColorLightGray);
-//   text_layer_set_text_color(s_emoji_layer, GColorLightGray);
   text_layer_set_background_color(s_step_layer, GColorClear);
-//   text_layer_set_background_color(s_emoji_layer, GColorClear);
   text_layer_set_font(s_step_layer,
                       fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SKWATCH_35)));
-//   text_layer_set_font(s_emoji_layer,
-//                       fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
   text_layer_set_text_alignment(s_step_layer, GTextAlignmentRight);
-//   text_layer_set_text_alignment(s_emoji_layer, GTextAlignmentCenter);
   
   layer_add_child(window_layer, text_layer_get_layer(s_step_layer));
-//   layer_add_child(window_layer, text_layer_get_layer(s_emoji_layer));
 
   // Subscribe to health events if we can
   if(step_data_is_available()) {
@@ -327,7 +301,6 @@ static void main_window_unload(Window *window) {
   battery_state_service_unsubscribe();
   text_layer_destroy(s_battery_layer);
   text_layer_destroy(s_step_layer);
-  text_layer_destroy(s_emoji_layer);
 }
 
 static void init() {
