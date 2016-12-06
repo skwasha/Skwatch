@@ -1,6 +1,8 @@
 {
     "author": "Sascha Linn",
-    "dependencies": {},
+    "dependencies": {
+        "pebble-clay": "^1.0.0"
+    },
     "keywords": [],
     "name": "skwatch",
     "pebble": {
@@ -11,12 +13,11 @@
         ],
         "displayName": "Skwatch",
         "enableMultiJS": true,
-        "messageKeys": {
-            "KEY_BACKGROUND_COLOR": 2,
-            "KEY_CONDITIONS": 1,
-            "KEY_TEMPERATURE": 0,
-            "KEY_TWENTY_FOUR_HOUR_FORMAT": 3
-        },
+        "messageKeys": [
+            "Temperature",
+            "Conditions",
+            "BackgroundColor"
+        ],
         "projectType": "native",
         "resources": {
             "media": [
@@ -31,12 +32,13 @@
         "sdkVersion": "3",
         "targetPlatforms": [
             "aplite",
-            "basalt"
+            "basalt",
+            "emery"
         ],
         "uuid": "04320de2-433f-4030-847c-53b5dcba6c46",
         "watchapp": {
             "watchface": true
         }
     },
-    "version": "1.0.0"
+    "version": "1.2.0"
 }

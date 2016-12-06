@@ -1,3 +1,7 @@
+var Clay = require('pebble-clay');
+var clayConfig = require('./config');
+var clay = new Clay(clayConfig);
+
 var myAPIKey = 'a3ad549b26e94b13ecd54eb085c6ea68';
 
 var xhrRequest = function (url, type, callback) {
@@ -30,8 +34,8 @@ function locationSuccess(pos) {
       
       // Assemble dictionary using our keys
       var dictionary = {
-        "KEY_TEMPERATURE": temperature,
-        "KEY_CONDITIONS": conditions
+        "Temperature": temperature,
+        "Conditions": conditions
       };
 
       // Send to Pebble
